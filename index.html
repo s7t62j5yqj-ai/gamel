@@ -157,6 +157,10 @@ input{
 .quote{margin-top:10px;font-size:14px;opacity:0.9}
 .coupon{font-size:20px;color:#00ff88;margin:8px 0}
 
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:12px}
+.box{background:rgba(255,255,255,0.08);padding:14px;border-radius:12px;font-size:13px;cursor:pointer;text-align:center}
+.box:hover{background:rgba(0,255,150,0.2)}
+
 </style>
 </head>
 <body>
@@ -191,6 +195,12 @@ input{
     <div class="bottom-area" id="status">Tap fast</div>
 
   </div>
+</div>
+
+<div class="card hidden" id="choice">
+  <h1>🎁 Choose Your Reward</h1>
+  <p style="font-size:13px;opacity:.8">Memorize… shuffling soon</p>
+  <div class="grid" id="rewardGrid"></div>
 </div>
 
 <div class="card hidden" id="end">
@@ -262,11 +272,65 @@ function end(){
   running=false;
 
   document.getElementById('game').classList.add('hidden');
+  showRewards();
+}
+
+/* REWARD SYSTEM */
+
+const rewards=[
+  "₹999 Cash Prize",
+  "99% Coupon Code",
+  "70% Recharge Discount",
+  "₹500 Gift Card",
+  "₹1200 Mega Reward",
+  "Free Shopping Voucher",
+  "₹750 Cashback",
+  "Premium Coupon Access",
+  "₹300 Bonus",
+  "Special Surprise Reward"
+];
+
+const grid=document.getElementById('rewardGrid');
+
+function showRewards(){
+  const choice=document.getElementById('choice');
+  choice.classList.remove('hidden');
+
+  grid.innerHTML="";
+
+  rewards.forEach(r=>{
+    let div=document.createElement('div');
+    div.className='box';
+    div.innerText=r;
+    grid.appendChild(div);
+  });
+
+  setTimeout(shuffleRewards,2000);
+}
+
+function shuffleRewards(){
+  const boxes=document.querySelectorAll('.box');
+
+  boxes.forEach(b=>{
+    b.innerText='❓';
+  });
+
+  setTimeout(()=>{
+    boxes.forEach(b=>b.onclick=pickReward);
+  },500);
+}
+
+function pickReward(){
+  document.getElementById('choice').classList.add('hidden');
   document.getElementById('end').classList.remove('hidden');
 
   const name=document.getElementById('name').value||'Player';
 
   document.getElementById('title').textContent=`🔥 ${name}, well played`;
+  document.getElementById('performance').textContent=`${name}, your speed and focus were impressive.`;
+  document.getElementById('gratitude').textContent='We truly appreciate your time and energy. Moments like this build something bigger. Keep going.';
+  document.getElementById('quote').textContent='Consistency creates excellence.';
+}, well played`;
   document.getElementById('performance').textContent=`${name}, great energy and focus.`;
   document.getElementById('gratitude').textContent='We truly appreciate your time and presence. Keep growing.';
   document.getElementById('quote').textContent='Consistency builds greatness.';
