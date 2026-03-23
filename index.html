@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
+
+<title>Fast Touch Elite</title>
+
+<style>
+body {
+    margin: 0;
+    font-family: 'Outfit', sans-serif;
+    background: radial-gradient(circle at top, #111, #000);
+    color: white;
+    overflow: hidden;
+}
+
+.container {
+    max-inline-size: 380px;
+    margin: auto;
+    padding: 15px;
+    text-align: center;
+}
+
+.card {
+    background: rgba(255,255,255,0.05);
+    border-radius: 20px;
+    padding: 20px;
+    backdrop-filter: blur(20px);
+    box-shadow: 0 0 40px rgba(0,255,200,0.15);
+    transition: all 0.4s ease;
+}
+
+input {
+    inline-size: 100%;
+    padding: 10px;
+    border-radius: 10px;
+    border: none;
+    margin-block-end: 10px;
+}
+
+button {
+    inline-size: 100%;
+    padding: 12px;
+    border-radius: 12px;
+    border: none;
+    background: linear-gradient(90deg, #ff9800, #ff5722);
+    color: white;
+    font-weight: bold;
+    margin-block-start: 10px;
+}
+
+#tapBtn {
+    position: absolute;
+    inline-size: 100px;
+    block-size: 100px;
+    border-radius: 50%;
+    border: none;
+    background: linear-gradient(145deg, #00ffd5, #00ff88);
+    box-shadow: 0 0 30px rgba(0,255,200,0.6);
+    transition: all 0.2s ease;
+}
+
+#tapBtn:active {
+    transform: scale(0.85);
+}
+
+.stats {
+    display: flex;
+    justify-content: space-between;
+    margin-block-end: 10px;
+}
+
+.progress {
+    block-size: 6px;
+    background: #222;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.progress-bar {
+    block-size: 100%;
+    inline-size: 0%;
+    background: #00ff88;
+    transition: width 0.2s;
+}
+
+.hidden { display: none; }
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    margin-block-start: 15px;
+}
+
+.box {
+    background: rgba(255,255,255,0.08);
+    padding: 15px;
+    border-radius: 12px;
+    font-size: 13px;
+    cursor: pointer;
+}
+
+.box:hover {
+    background: rgba(0,255,150,0.2);
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<!-- START -->
+<div class="card" id="startScreen">
+    <h2>⚡ Fast Touch Elite</h2>
+    <input id="nameInput" placeholder="Enter your name">
+    <button onclick="begin()">Start</button>
+</div>
+
+<!-- GAME -->
+<div class="card hidden" id="gameCard">
+    <div class="stats">
+        <span id="timer">10s</span>
+        <span id="score">0</span>
+        <span id="combo">x1</span>
+    </div>
+
+    <div class="progress">
+        <div class="progress-bar" id="progressBar"></div>
+    </div>
+
+    <p id="msg">Go!</p>
+    <button id="tapBtn">TAP</button>
+</div>
+
+<!-- CHOOSE REWARD -->
+<div class="card hidden" id="choiceCard">
+    <h2>🎁 Choose Your Reward</h2>
+    <p>Memorize quickly… shuffling soon</p>
+    <div class="grid" id="rewardGrid"></div>
+</div>
+
+<!-- FINAL -->
+<div class="card hidden" id="finalReward">
+    <h2 id="finalTitle"></h2>
+    <p id="personalMessage"></p>
+
+    <div class="reward-box">
+        <p><strong>Your Reward:</strong></p>
+        <h3>R1C1A1988BYFL3KU</h3>
+    </div>
+
+    <p id="gratitudeText" style="margin-block-start:15px;font-size:14px;opacity:0.85;"></p>
+
+    <button onclick="visit()">Claim Now</button>
+</div>
+
+</div>
+
+<script>
+let score=0, time=10, combo=1, running=false;
+let interval;
+
+const tap=document.getElementById("tapBtn");
+const scoreEl=document.getElementById("score");
+const timerEl=document.getElementById("timer");
+const comboEl=document.getElementById("combo");
+const progress=document.getElementById("progressBar");
+const msg=document.getElementById("msg");
+
+function begin(){
+    document.getElementById("startScreen").classList.add("hidden");
+    document.getElementById("gameCard").classList.remove("hidden");
+    start();
+}
+
+function move(){
+    tap.style.left=Math.random()*250+"px";
+    tap.style.top=Math.random()*350+"px";
+}
+
+tap.onclick=()=>{
+    if(!running)return;
+
+    score+=combo;
+    combo++;
+    scoreEl.textContent=score;
+    comboEl.textContent="x"+combo;
+
+    progress.style.width=Math.min(score*2,100)+"%";
+
+    move();
+
+    if(score>20) msg.textContent="🔥 You're on fire!";
+    if(score>40) msg.textContent="⚡ Insane speed!";
+};
+
+function start(){
+    score=0; time=10; combo=1; running=true;
+    move();
+
+    interval=setInterval(()=>{
+        time--;
+        timerEl.textContent=time+"s";
+
+        if(time<=0) end();
+    },1000);
+}
+
+function end(){
+    clearInterval(interval);
+    running=false;
+    showChoices();
+}
+
+/* REWARD SYSTEM */
+
+const rewards = [
+    "₹1200 Cash",
+    "Coupon Reward",
+    "₹500 Gift",
+    "₹999 Cashback",
+    "₹250 Voucher",
+    "₹750 Reward",
+    "₹300 Bonus",
+    "₹1500 Prize",
+    "₹200 Coupon",
+    "₹1000 Gift"
+];
+
+const grid = document.getElementById("rewardGrid");
+
+function showChoices(){
+    document.getElementById("gameCard").classList.add("hidden");
+    document.getElementById("choiceCard").classList.remove("hidden");
+
+    grid.innerHTML = "";
+
+    rewards.forEach((r)=>{
+        let div=document.createElement("div");
+        div.className="box";
+        div.innerText=r;
+        grid.appendChild(div);
+    });
+
+    setTimeout(shuffleBoxes,2000);
+}
+
+function shuffleBoxes(){
+    const boxes=document.querySelectorAll(".box");
+
+    boxes.forEach(b=>{
+        b.innerText="❓";
+    });
+
+    setTimeout(()=>{
+        boxes.forEach(b=>b.onclick=pickReward);
+    },500);
+}
+
+function pickReward(){
+    document.getElementById("choiceCard").classList.add("hidden");
+
+    setTimeout(()=>{
+        showFinal();
+    },700);
+}
+
+function showFinal(){
+    document.getElementById("finalReward").classList.remove("hidden");
+
+    const name=document.getElementById("nameInput").value || "Player";
+
+    document.getElementById("finalTitle").textContent=`🔥 Amazing, ${name}!`;
+
+    let performance="";
+    if(score>40){
+        performance="You absolutely dominated with insane speed.";
+    } else if(score>25){
+        performance="Strong performance with great consistency.";
+    } else {
+        performance="Good effort — you’re close to mastery.";
+    }
+
+    document.getElementById("personalMessage").textContent=
+        `${name}, ${performance}`;
+
+    document.getElementById("gratitudeText").textContent=
+        "We truly appreciate you being part of this moment. You showed focus, energy, and intent. Keep pushing forward — every small effort builds something bigger. Stay sharp, stay hungry, and keep winning. 🚀";
+}
+
+function visit(){
+    window.open("https://mamaearth.in/?srsltid=AfmBOorN81MsCi5cuP5ilXDJ_ws71OU2q9wtgtvADYqKfOycoQ-xQERc");
+}
+</script>
+
+</body>
+</html>
